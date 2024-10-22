@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+  STAFF
+}
+
+model User {
+  id               Int                @id @default(autoincrement())
+  username         String             @unique @db.VarChar(30)
+  password         String             @db.VarChar(72)
+  email            String?
+  phoneNumber      String?
+  imgprofile       String?
+  role             Role               @default(USER)
+  TableReservation TableReservation[]
+  Purchase         Purchase[]
+
+  @@map("users")
+}
+
+model Product {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  img         String
+
+  @@map("products")
+}
+
+model TableReservation {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  tableNumber String?
+  date        DateTime
+  status      String?
+  username    String
+  confirmbooking String?
+
+  @@map("table_reservations")
+}
+
+model Purchase {
+  id          Int     @id @default(autoincrement())
+  userId      Int
+  user        User    @relation(fields: [userId], references: [id])
+  table       String
+  name        String
+  description String
+  price       Float
+  quantity    Float
+  payment     String
+  img         String
+  status      String?
+  imgcredit   String?  @db.Text
+
+  @@map("purchases")
+}
+
+enum Status {
+  PENDING
+  DOING
+  DONE
+}
